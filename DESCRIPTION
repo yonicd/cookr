@@ -1,0 +1,16 @@
+Package: cookr
+Title: Realtime Tracker of US Congressional Elections 2018
+Version: 0.0.0.9000
+Authors@R: person(given = "Jonathan",
+             family = "Sidi",
+             role = c("cre",'aut'),
+             email = "yonicd@gmail.com",
+             comment = c(ORCID = "0000-0002-4222-1819"))
+Description: Combine Live Cook Political Report Google Spreadsheet 
+  with Ballotpedia Historical Data to Investigate Voter Turnout in Real Time.
+Depends: R (>= 3.3.3)
+Imports: dplyr,purrr,stats,tidyr,tibble,ggplot2,ggrepel,scales,geojsonio,rgeos,httr,rvest
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.0

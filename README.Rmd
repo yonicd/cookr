@@ -1,0 +1,108 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
+# cookr
+
+The goal of cookr is to track in real time the results of the 2018 US congressional election by district using a live [google spreatsheet](https://docs.google.com/spreadsheets/d/1WxDaxD5az6kdOjJncmGph37z0BPNhV1fNAH_g7IkpC0/htmlview?sle=true#gid=326900537) populated by [Cook political report](https://www.cookpolitical.com/), and add historical context of reported results using [Ballotpedia](https://ballotpedia.org/).
+
+The package locates which districts are still active and searches for adjacent districts to get their restults too, using this [geojson file](https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/us-congress-113.json).
+
+In the package there is a plotting function to vizualize the time depedent results.
+
+Sticking a pin in this is to have data to model in the future expected voter turnout with higher frequency data.
+
+## Installation
+
+You can install cookr from github with:
+
+```{r gh-installation, eval = FALSE}
+# install.packages("remotes")
+remotes::install_github("yonicd/cookr")
+```
+
+## Usage
+
+### Load Library
+
+```{r}
+library(cookr)
+```
+
+### Fetching The Spreadsheet
+
+```{r}
+cook_data <- cookr::fetch_spreadsheet()
+```
+
+Peek at Data
+
+```{r}
+cook_data%>%
+  dplyr::glimpse()
+```
+
+Filter to open districts
+
+```{r}
+open_districts <- cook_data%>%
+  cookr::cook_open()
+```
+
+Find the adjacent districts
+
+```{r}
+adjacent_districts <- open_districts%>%
+  cookr::cook_adjacent()
+```
+
+Combine Data
+
+```{r}
+districts <- dplyr::bind_rows(open_districts,adjacent_districts)
+```
+
+```{r}
+districts%>%
+  dplyr::glimpse()
+```
+
+Fetch Historical Results of the Districts From Ballotpedia
+
+```{r}
+cook_history <- districts%>%
+  cook_ballotpedia()
+```
+
+```{r}
+cook_history%>%
+  dplyr::glimpse()
+```
+
+### Plotting
+
+```{r,fig.height=7,fig.width=7}
+p <- cook_history%>%
+  cook_plot()
+
+p
+```
+ 
+### Saving 
+ 
+```{r,eval=FALSE}
+ggsave(p,filename = sprintf('plots/cook_%s.png',strftime(Sys.Date(),format = '%Y_%m_%d')))
+
+saveRDS(cook_html,file = sprintf('src_data/cook_spreadsheet_%s.rds',strftime(Sys.Date(),format = '%Y_%m_%d')))
+
+```
