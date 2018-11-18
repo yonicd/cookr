@@ -18,7 +18,9 @@ The goal of cookr is to track in real time the results of the 2018 US congressio
 
 The package locates which districts are still active and searches for adjacent districts to get their restults too, using this [geojson file](https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/us-congress-113.json).
 
-In the package there is a plotting function to vizualize the time depedent results.
+In the package there is a plotting function to vizualize the time depedent results. To create an output like this
+
+![](plots/cook_2018_11_18.png)
 
 Sticking a pin in this is to have data to model in the future expected voter turnout with higher frequency data.
 
