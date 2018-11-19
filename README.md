@@ -17,7 +17,7 @@ file](https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8
 In the package there is a plotting function to vizualize the time
 depedent results. To create an output like this
 
-![](plots/cook_2018_11_18.png)<!-- -->
+![](plots/cook_2018_11_19.png)
 
 Sticking a pin in this is to have data to model in the future expected
 voter turnout with higher frequency data.
@@ -42,7 +42,12 @@ library(cookr)
 ### Fetching The Spreadsheet
 
 ``` r
-cook_data <- cookr::fetch_spreadsheet()
+cook_html <- httr::GET('https://docs.google.com/spreadsheets/d/1WxDaxD5az6kdOjJncmGph37z0BPNhV1fNAH_g7IkpC0/htmlview?sle=true#gid=326900537')
+```
+
+``` r
+cook_data <- cook_html%>%
+  cookr::fetch_spreadsheet()
 ```
 
 Peek at Data
@@ -79,6 +84,12 @@ open_districts <- cook_data%>%
   cookr::cook_open()
 ```
 
+| State      | district | Dem Votes | GOP Votes | Dem Margin |  total | type |
+| :--------- | :------- | --------: | --------: | ---------: | -----: | :--- |
+| California | 21       |     48997 |     51175 |     \-2178 | 100172 | open |
+| Georgia    | 7        |    140011 |    140430 |      \-419 | 280441 | open |
+| Utah       | 4        |    128587 |    129006 |      \-419 | 257593 | open |
+
 Find the adjacent districts
 
 ``` r
@@ -86,27 +97,42 @@ adjacent_districts <- open_districts%>%
   cookr::cook_adjacent()
 ```
 
-Combine Data
+Combine
+Data
 
 ``` r
 districts <- dplyr::bind_rows(open_districts,adjacent_districts)
 ```
 
-``` r
-districts%>%
-  dplyr::glimpse()
-#> Observations: 15
-#> Variables: 9
-#> $ State          <chr> "California", "Georgia", "Utah", "California", ...
-#> $ district       <chr> "21", "7", "4", "16", "20", "22", "23", "24", "...
-#> $ state_district <chr> "California_21", "Georgia_7", "Utah_4", "Califo...
-#> $ `Dem Votes`    <dbl> 48997, 140011, 128587, 73352, 156467, 92462, 65...
-#> $ `GOP Votes`    <dbl> 51175, 140430, 129006, 56543, 0, 106240, 120687...
-#> $ `Dem Margin`   <dbl> -2178, -419, -419, 16809, 156467, -13778, -5497...
-#> $ total          <dbl> 100172, 280441, 257593, 129895, 156467, 198702,...
-#> $ type           <chr> "open", "open", "open", "adjacent", "adjacent",...
-#> $ home_district  <chr> "California_21", "Georgia_7", "Utah_4", "Califo...
-```
+$California\_21
+
+| State      | district | Dem Votes | GOP Votes | Dem Margin |  total | type     |
+| :--------- | :------- | --------: | --------: | ---------: | -----: | :------- |
+| California | 21       |     48997 |     51175 |     \-2178 | 100172 | open     |
+| California | 16       |     73352 |     56543 |      16809 | 129895 | adjacent |
+| California | 20       |    156467 |         0 |     156467 | 156467 | adjacent |
+| California | 22       |     92462 |    106240 |    \-13778 | 198702 | adjacent |
+| California | 23       |     65717 |    120687 |    \-54970 | 186404 | adjacent |
+| California | 24       |    154575 |    111870 |      42705 | 266445 | adjacent |
+
+$Georgia\_7
+
+| State   | district | Dem Votes | GOP Votes | Dem Margin |  total | type     |
+| :------ | :------- | --------: | --------: | ---------: | -----: | :------- |
+| Georgia | 7        |    140011 |    140430 |      \-419 | 280441 | open     |
+| Georgia | 4        |    227706 |     61092 |     166614 | 288798 | adjacent |
+| Georgia | 6        |    160134 |    156874 |       3260 | 317008 | adjacent |
+| Georgia | 9        |     57912 |    224661 |   \-166749 | 282573 | adjacent |
+| Georgia | 10       |    112325 |    190389 |    \-78064 | 302714 | adjacent |
+| Georgia | 11       |    118650 |    191885 |    \-73235 | 310535 | adjacent |
+
+$Utah\_4
+
+| State | district | Dem Votes | GOP Votes | Dem Margin |  total | type     |
+| :---- | :------- | --------: | --------: | ---------: | -----: | :------- |
+| Utah  | 4        |    128587 |    129006 |      \-419 | 257593 | open     |
+| Utah  | 2        |    100285 |    147556 |    \-47271 | 247841 | adjacent |
+| Utah  | 3        |     65456 |    164755 |    \-99299 | 230211 | adjacent |
 
 Fetch Historical Results of the Districts From Ballotpedia
 
@@ -115,26 +141,34 @@ cook_history <- districts%>%
   cook_ballotpedia()
 ```
 
-``` r
-cook_history%>%
-  dplyr::glimpse()
-#> Observations: 14
-#> Variables: 14
-#> $ State          <chr> "California", "Georgia", "Utah", "California", ...
-#> $ district       <chr> "21", "7", "4", "16", "20", "22", "23", "24", "...
-#> $ state_district <chr> "California_21", "Georgia_7", "Utah_4", "Califo...
-#> $ `Dem Votes`    <dbl> 48997, 140011, 128587, 73352, 156467, 92462, 65...
-#> $ `GOP Votes`    <dbl> 51175, 140430, 129006, 56543, 0, 106240, 120687...
-#> $ `Dem Margin`   <dbl> -2178, -419, -419, 16809, 156467, -13778, -5497...
-#> $ total          <dbl> 100172, 280441, 257593, 129895, 156467, 198702,...
-#> $ type           <chr> "open", "open", "open", "adjacent", "adjacent",...
-#> $ home_district  <chr> "California_21", "Georgia_7", "Utah_4", "Califo...
-#> $ history        <list> [[c("", "Current incumbentDavid Valadao Cook P...
-#> $ results        <list> [<132408, 79377, 116283, 135979, 209815, 14266...
-#> $ slack_q05      <dbl> 3193.90, -105913.80, -100614.10, -27777.10, -86...
-#> $ slack_q50      <dbl> 59134.0, -46202.0, -12316.0, 21771.5, -41496.5,...
-#> $ slack_q95      <dbl> 104960.40, 39847.80, 14046.80, 60452.10, 84875....
-```
+$California\_21
+
+| State      | district | Dem Votes | GOP Votes | Dem Margin |  total | type     |  slack\_q05 | slack\_q50 | slack\_q95 |
+| :--------- | :------- | --------: | --------: | ---------: | -----: | :------- | ----------: | ---------: | ---------: |
+| California | 21       |     48997 |     51175 |     \-2178 | 100172 | open     |     3193.90 |    59134.0 |  104960.40 |
+| California | 16       |     73352 |     56543 |      16809 | 129895 | adjacent |  \-27777.10 |    21771.5 |   60452.10 |
+| California | 20       |    156467 |         0 |     156467 | 156467 | adjacent |  \-86474.50 |  \-41496.5 |   84875.15 |
+| California | 22       |     92462 |    106240 |    \-13778 | 198702 | adjacent |  \-45247.05 |    10494.0 |   53024.40 |
+| California | 23       |     65717 |    120687 |    \-54970 | 186404 | adjacent |  \-35258.85 |    10081.0 |   60514.85 |
+| California | 24       |    154575 |    111870 |      42705 | 266445 | adjacent | \-147530.50 |  \-77352.5 |   32829.15 |
+
+$Georgia\_7
+
+| State   | district | Dem Votes | GOP Votes | Dem Margin |  total | type     | slack\_q05 | slack\_q50 | slack\_q95 |
+| :------ | :------- | --------: | --------: | ---------: | -----: | :------- | ---------: | ---------: | ---------: |
+| Georgia | 7        |    140011 |    140430 |      \-419 | 280441 | open     | \-105913.8 |    \-46202 |    39847.8 |
+| Georgia | 4        |    227706 |     61092 |     166614 | 288798 | adjacent | \-142821.2 |    \-64104 |    \-793.8 |
+| Georgia | 6        |    160134 |    156874 |       3260 | 317008 | adjacent | \-117934.4 |    \-49389 |    24177.0 |
+| Georgia | 9        |     57912 |    224661 |   \-166749 | 282573 | adjacent | \-114103.2 |    \-39042 |   \-3222.6 |
+| Georgia | 10       |    112325 |    190389 |    \-78064 | 302714 | adjacent | \-122217.2 |    \-97747 |  \-25264.4 |
+
+$Utah\_4
+
+| State | district | Dem Votes | GOP Votes | Dem Margin |  total | type     | slack\_q05 | slack\_q50 | slack\_q95 |
+| :---- | :------- | --------: | --------: | ---------: | -----: | :------- | ---------: | ---------: | ---------: |
+| Utah  | 4        |    128587 |    129006 |      \-419 | 257593 | open     | \-100614.1 |    \-12316 |    14046.8 |
+| Utah  | 2        |    100285 |    147556 |    \-47271 | 247841 | adjacent |  \-70559.2 |       4438 |    97941.2 |
+| Utah  | 3        |     65456 |    164755 |    \-99299 | 230211 | adjacent |  \-83373.8 |       7137 |    54999.6 |
 
 ### Plotting
 
@@ -147,12 +181,13 @@ p <- cook_history%>%
 p
 ```
 
-![](README-unnamed-chunk-11-1.png)<!-- -->
+![](README-unnamed-chunk-15-1.png)<!-- -->
 
 ### Saving
 
 ``` r
-ggsave(p,filename = sprintf('plots/cook_%s.png',strftime(Sys.Date(),format = '%Y_%m_%d')))
+ggplot2::ggsave(p,filename = sprintf('plots/cook_%s.png',strftime(Sys.Date(),format = '%Y_%m_%d')))
 
 saveRDS(cook_html,file = sprintf('src_data/cook_spreadsheet_%s.rds',strftime(Sys.Date(),format = '%Y_%m_%d')))
+saveRDS(cook_history,file = sprintf('src_data/cook_history_%s.rds',strftime(Sys.Date(),format = '%Y_%m_%d')))
 ```

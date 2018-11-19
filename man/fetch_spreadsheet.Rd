@@ -4,7 +4,10 @@
 \alias{fetch_spreadsheet}
 \title{Cook spreadsheet}
 \usage{
-fetch_spreadsheet()
+fetch_spreadsheet(cook_html)
+}
+\arguments{
+\item{cook_html}{response, object returned from GET call of the cook google spreadsheet.}
 }
 \value{
 OUTPUT_DESCRIPTION
@@ -13,7 +16,7 @@ OUTPUT_DESCRIPTION
 FUNCTION_DESCRIPTION
 }
 \details{
-DETAILS
+Tinyurl address of cook google spreadsheet http://tinyurl.com/y9jxsgmt
 }
 \examples{
 \dontrun{

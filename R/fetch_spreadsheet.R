@@ -1,7 +1,8 @@
 #' @title Cook spreadsheet
 #' @description FUNCTION_DESCRIPTION
+#' @param cook_html response, object returned from GET call of the cook google spreadsheet.
 #' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @details Tinyurl address of cook google spreadsheet http://tinyurl.com/y9jxsgmt
 #' @examples 
 #' \dontrun{
 #' if(interactive()){
@@ -12,8 +13,7 @@
 #' @export 
 #' @importFrom httr GET content
 #' @importFrom rvest html_table
-fetch_spreadsheet <- function(){
-  cook_html <- httr::GET('https://docs.google.com/spreadsheets/d/1WxDaxD5az6kdOjJncmGph37z0BPNhV1fNAH_g7IkpC0/htmlview?sle=true#gid=326900537')
+fetch_spreadsheet <- function(cook_html){
   cook_content <- httr::content(cook_html)
   cook_table <- rvest::html_table(cook_content)[[1]]
   cook_data <- cook_table[-c(1:4),]

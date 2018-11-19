@@ -20,7 +20,7 @@ The package locates which districts are still active and searches for adjacent d
 
 In the package there is a plotting function to vizualize the time depedent results. To create an output like this
 
-![](plots/cook_2018_11_18.png)
+![](plots/cook_2018_11_19.png)
 
 Sticking a pin in this is to have data to model in the future expected voter turnout with higher frequency data.
 
@@ -43,8 +43,17 @@ library(cookr)
 
 ### Fetching The Spreadsheet
 
+```{r,eval=FALSE}
+cook_html <- httr::GET('https://docs.google.com/spreadsheets/d/1WxDaxD5az6kdOjJncmGph37z0BPNhV1fNAH_g7IkpC0/htmlview?sle=true#gid=326900537')
+```
+
+```{r,include=FALSE}
+cook_html <- readRDS('src_data/cook_spreadsheet_2018_11_19.rds')
+```
+
 ```{r}
-cook_data <- cookr::fetch_spreadsheet()
+cook_data <- cook_html%>%
+  cookr::fetch_spreadsheet()
 ```
 
 Peek at Data
@@ -61,6 +70,10 @@ open_districts <- cook_data%>%
   cookr::cook_open()
 ```
 
+```{r,echo=FALSE}
+open_districts%>%dplyr::select(-c(state_district,home_district))%>%knitr::kable()
+```
+
 Find the adjacent districts
 
 ```{r}
@@ -74,21 +87,23 @@ Combine Data
 districts <- dplyr::bind_rows(open_districts,adjacent_districts)
 ```
 
-```{r}
-districts%>%
-  dplyr::glimpse()
+```{r,echo=FALSE,results='asis'}
+districts%>%split(districts$home_district)%>%purrr::map(.f=function(x) x%>%dplyr::select(-c(state_district,home_district)))%>%purrr::map(knitr::kable)
 ```
 
 Fetch Historical Results of the Districts From Ballotpedia
 
-```{r}
+```{r,eval=FALSE}
 cook_history <- districts%>%
   cook_ballotpedia()
 ```
 
-```{r}
-cook_history%>%
-  dplyr::glimpse()
+```{r,include=FALSE}
+cook_history <- readRDS('src_data/cook_history_2018_11_19.rds')
+```
+
+```{r,echo=FALSE,results='asis'}
+cook_history%>%split(cook_history$home_district)%>%purrr::map(.f=function(x) x%>%dplyr::select(-c(state_district,home_district,history,results)))%>%purrr::map(knitr::kable)
 ```
 
 ### Plotting
@@ -103,8 +118,8 @@ p
 ### Saving 
  
 ```{r,eval=FALSE}
-ggsave(p,filename = sprintf('plots/cook_%s.png',strftime(Sys.Date(),format = '%Y_%m_%d')))
+ggplot2::ggsave(p,filename = sprintf('plots/cook_%s.png',strftime(Sys.Date(),format = '%Y_%m_%d')))
 
 saveRDS(cook_html,file = sprintf('src_data/cook_spreadsheet_%s.rds',strftime(Sys.Date(),format = '%Y_%m_%d')))
-
+saveRDS(cook_history,file = sprintf('src_data/cook_history_%s.rds',strftime(Sys.Date(),format = '%Y_%m_%d')))
 ```
