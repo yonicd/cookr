@@ -102,6 +102,8 @@ cook_history <- districts%>%
 cook_history <- readRDS('src_data/cook_history_2018_11_19.rds')
 ```
 
+Slack is defined as the historical reported votes minus the reported votes in 2018 for each election year. The 5th,50th and 95th percentiles of this distribution is shown in the table. This measurement gives a plausible range of votes remaining to count in the open districts.
+
 ```{r,echo=FALSE,results='asis'}
 cook_history%>%split(cook_history$home_district)%>%purrr::map(.f=function(x) x%>%dplyr::select(-c(state_district,home_district,history,results)))%>%purrr::map(knitr::kable)
 ```

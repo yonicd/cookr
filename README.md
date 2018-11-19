@@ -141,6 +141,12 @@ cook_history <- districts%>%
   cook_ballotpedia()
 ```
 
+Slack is defined as the historical reported votes minus the reported
+votes in 2018 for each election year. The 5th,50th and 95th percentiles
+of this distribution is shown in the table. This measurement gives a
+plausible range of votes remaining to count in the open
+districts.
+
 $California\_21
 
 | State      | district | Dem Votes | GOP Votes | Dem Margin |  total | type     |  slack\_q05 | slack\_q50 | slack\_q95 |
